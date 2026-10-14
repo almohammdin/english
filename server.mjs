@@ -6,7 +6,7 @@ import {timingSafeEqual} from 'node:crypto';
 const PORT=Number(process.env.PORT||8787),HOST=process.env.HOST||'127.0.0.1';
 const allowedOrigin=process.env.ALLOWED_ORIGIN||`http://localhost:${PORT}`;
 const limits=new Map();
-const files=new Set(['index.html','style.css','data.js','curriculum.js','app.js','icon.svg','social.png','font.woff2','bold.woff2']);
+const files=new Set(['index.html','style.css','data.js','curriculum.js','coach-data.js','exams.js','coach.js','app.js','icon.svg','social.png','font.woff2','bold.woff2']);
 const mime={'.html':'text/html; charset=utf-8','.js':'text/javascript; charset=utf-8','.css':'text/css; charset=utf-8','.svg':'image/svg+xml','.png':'image/png','.woff2':'font/woff2'};
 function reply(res,status,data){res.writeHead(status,{'Content-Type':'application/json','Cache-Control':'no-store'});res.end(JSON.stringify(data))}
 function authorized(req){const expected=process.env.TUTOR_ACCESS_TOKEN;if(!expected||expected.length<24)return false;const provided=String(req.headers.authorization||'').replace(/^Bearer /,'');const a=Buffer.from(provided),b=Buffer.from(expected);return a.length===b.length&&timingSafeEqual(a,b)}

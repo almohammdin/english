@@ -24,16 +24,20 @@ jobs:
       - name: Check JavaScript and lesson data
         run: |
           node --check app.js
+          node --check coach.js
+          node --check coach-data.js
+          node --check exams.js
           node --check curriculum.js
           node --check server.mjs
           node tests/content.test.cjs
+          node tests/coach.test.cjs
       - uses: actions/configure-pages@v5
         with:
           enablement: true
       - name: Prepare public files
         run: |
           mkdir -p public
-          cp index.html style.css data.js curriculum.js app.js icon.svg social.png font.woff2 bold.woff2 public/
+          cp index.html style.css data.js curriculum.js coach-data.js exams.js coach.js app.js icon.svg social.png font.woff2 bold.woff2 public/
           touch public/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:
