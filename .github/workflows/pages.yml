@@ -31,13 +31,14 @@ jobs:
           node --check server.mjs
           node tests/content.test.cjs
           node tests/coach.test.cjs
+          node tests/tutor.test.mjs
       - uses: actions/configure-pages@v5
         with:
           enablement: true
       - name: Prepare public files
         run: |
           mkdir -p public
-          cp index.html style.css data.js curriculum.js coach-data.js exams.js coach.js app.js icon.svg social.png font.woff2 bold.woff2 public/
+          cp index.html style.css data.js curriculum.js coach-data.js exams.js coach.js app.js tutor.js firebase-tutor.mjs book-index.mjs course-search.mjs icon.svg social.png font.woff2 bold.woff2 public/
           touch public/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:

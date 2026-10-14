@@ -3,3 +3,6 @@ node_modules/
 .env.*
 !.env.example
 .DS_Store
+
+# Full curriculum remains on the private tutor server only.
+private/
