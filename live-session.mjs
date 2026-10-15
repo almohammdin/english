@@ -1,7 +1,7 @@
 // Adapt the current Mesraah ephemeral-token transport to the teacher's audio loop.
 export const LIVE_MODEL='gemini-3.1-flash-live-preview';
 export const TOKEN_ENDPOINT='https://mesraah-live-token.naif123456.workers.dev/token';
-export async function fetchLiveToken(getToken,fetcher=fetch){for(let attempt=0;attempt<2;attempt++){const token=await getToken(attempt===1);const response=await fetcher(TOKEN_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','X-Firebase-AppCheck':token},body:'{}',signal:AbortSignal.timeout(15000)});const data=await response.json().catch(()=>({}));if(response.status===401&&attempt===0)continue;if(!response.ok||typeof data.token!=='string'||!data.token)throw Error('voice-token-http-'+response.status);return data.token;}throw Error('voice-token-http-401')}
+export async function fetchLiveToken(getToken,fetcher=fetch,signal){for(let attempt=0;attempt<2;attempt++){signal?.throwIfAborted();const token=await getToken(attempt===1);signal?.throwIfAborted();const response=await fetcher(TOKEN_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json','X-Firebase-AppCheck':token},body:'{}',signal:signal?AbortSignal.any([signal,AbortSignal.timeout(15000)]):AbortSignal.timeout(15000)});const data=await response.json().catch(()=>({}));if(response.status===401&&attempt===0)continue;if(!response.ok||typeof data.token!=='string'||!data.token)throw Error('voice-token-http-'+response.status);return data.token;}throw Error('voice-token-http-401')}
 export function createLiveAdapter(){const queue=[];let wake,closed=false,failure=null,session=null;
  const push=value=>{if(closed)return;queue.push(value);wake?.();wake=null};
  const end=error=>{closed=true;failure=error||null;wake?.();wake=null};
