@@ -24,6 +24,10 @@ jobs:
       - name: Check JavaScript and lesson data
         run: |
           node --check app.js
+          node --check voice-tools.js
+          node --check voice-ui.js
+          node --check voice-live.mjs
+          node --check voice-capture.js
           node --check coach.js
           node --check coach-data.js
           node --check exams.js
@@ -32,13 +36,14 @@ jobs:
           node tests/content.test.cjs
           node tests/coach.test.cjs
           node tests/tutor.test.mjs
+          node tests/voice.test.mjs
       - uses: actions/configure-pages@v5
         with:
           enablement: true
       - name: Prepare public files
         run: |
           mkdir -p public
-          cp index.html style.css data.js curriculum.js coach-data.js exams.js coach.js app.js tutor.js firebase-tutor.mjs book-index.mjs course-search.mjs icon.svg social.png font.woff2 bold.woff2 public/
+          cp index.html style.css data.js curriculum.js coach-data.js exams.js coach.js app.js tutor.js firebase-tutor.mjs firebase-connection.mjs voice-tools.js voice-ui.js voice-live.mjs voice-capture.js book-index.mjs course-search.mjs icon.svg social.png font.woff2 bold.woff2 public/
           touch public/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:
