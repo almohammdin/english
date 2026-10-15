@@ -25,3 +25,5 @@
 @keyframes voice-wave{to{height:32px}}
 @media(max-width:600px){.voice-assistant{left:16px;bottom:calc(15px + env(safe-area-inset-bottom))}.voice-mic{width:72px;height:72px}.voice-panel{max-height:60dvh}.shell{padding-bottom:110px}.voice-caption{padding:7px 12px}}
 @media(prefers-reduced-motion:reduce){.voice-wave i{animation:none!important}.voice-highlight{transition:none}}
+
+.voice-input{padding:10px 0;border-top:1px solid #eee}.voice-input label{font-size:12px}.voice-input select{display:block;width:100%;font:inherit;font-size:12px;margin:6px 0;padding:6px;border:1px solid #dce3dc;border-radius:8px}.voice-input meter{display:block;width:100%;height:14px}.voice-input p{font-size:11px;min-height:20px}#voice-heard{color:#315e41;font-weight:700}

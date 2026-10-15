@@ -1,0 +1,12 @@
+import assert from 'node:assert/strict';
+import {encodeInput} from '../audio-input.mjs';
+import {VoiceConversation} from '../voice-live.mjs';
+for(const rate of [48000,44100,16000]){const input=Float32Array.from({length:rate/10},(_,i)=>.4*Math.sin(2*Math.PI*440*i/rate));const chunk=encodeInput(input,rate);const bytes=Buffer.from(chunk.data,'base64');assert.equal(bytes.length,3200);assert.ok(chunk.level>.27&&chunk.level<.3);assert.equal(chunk.mimeType,'audio/pcm;rate=16000');}
+assert.equal(encodeInput(new Float32Array(),48000),null);
+const sent=[],events=[],tracks=[{label:'Test microphone',readyState:'live',addEventListener(){},stop(){this.readyState='ended'}}];let processor,closed=0;
+const node=()=>({connect(){},disconnect(){}});
+class Audio {constructor(){this.sampleRate=48000;this.currentTime=0;this.state='suspended';this.destination={};}async resume(){this.state='running'}async close(){this.state='closed';closed++}createMediaStreamSource(){return node()}createScriptProcessor(){processor=node();return processor}createGain(){return {...node(),gain:{value:1}}}}
+Object.defineProperty(globalThis,'AudioContext',{value:Audio,configurable:true});Object.defineProperty(globalThis,'navigator',{value:{mediaDevices:{getUserMedia:async()=>({getTracks:()=>tracks,getAudioTracks:()=>tracks})}},configurable:true});
+let release;const session={sendAudioRealtime:async audio=>sent.push(audio),send:async()=>{},endAudio:async()=>events.push('end'),async *receive(){await new Promise(r=>release=r)},close(){release?.()}};
+const voice=new VoiceConversation({locked:()=>false},{input:e=>events.push(e)},{connect:async()=>session});await voice.start();processor.onaudioprocess({inputBuffer:{getChannelData:()=>new Float32Array(4096).fill(.25)}});await new Promise(r=>setTimeout(r,0));assert.equal(sent.length,1);assert.ok(Buffer.from(sent[0].data,'base64').length>2700);assert.equal(voice.sentFrames,1);voice.mute();processor.onaudioprocess({inputBuffer:{getChannelData:()=>new Float32Array(4096).fill(.25)}});assert.equal(sent.length,1);await voice.resumeMic();assert.equal(voice.muted,false);await voice.finishSpeaking();assert.ok(events.includes('end'));await voice.stop();assert.equal(processor.onaudioprocess,null);assert.equal(tracks[0].readyState,'ended');assert.equal(closed,1);
+console.log('PASS: real capture callback sends nonzero PCM to live transport, muted input blocked, resume/end-of-speech and microphone cleanup.');
