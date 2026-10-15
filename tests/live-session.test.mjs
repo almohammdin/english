@@ -1,0 +1,10 @@
+import assert from 'node:assert/strict';
+import {createLiveAdapter,fetchLiveToken,TOKEN_ENDPOINT,LIVE_MODEL} from '../live-session.mjs';
+const refresh=[],requests=[];let attempt=0;
+const token=await fetchLiveToken(async force=>{refresh.push(force);return 'appcheck-test'},async(url,opts)=>{requests.push({url,opts});return ++attempt===1?{status:401,ok:false,json:async()=>({})}:{status:200,ok:true,json:async()=>({token:'ephemeral-test'})}});
+assert.equal(token,'ephemeral-test');assert.deepEqual(refresh,[false,true]);assert.equal(requests[0].url,TOKEN_ENDPOINT);assert.equal(requests[0].opts.headers['X-Firebase-AppCheck'],'appcheck-test');
+await assert.rejects(fetchLiveToken(async()=>'',async()=>({status:503,ok:false,json:async()=>({})})),/503/);
+const adapter=createLiveAdapter(),sent=[];adapter.attach({sendRealtimeInput:x=>sent.push(x),sendClientContent:x=>sent.push(x),sendToolResponse:x=>sent.push(x),close:()=>sent.push('closed')});
+await adapter.sendAudioRealtime({mimeType:'audio/pcm;rate=16000',data:'test'});await adapter.send('hello');await adapter.sendFunctionResponses([{id:'a',name:'open_today',response:{ok:true}}]);assert.equal(sent[0].audio.data,'test');assert.equal(sent[1].turns[0].parts[0].text,'hello');assert.equal(sent[2].functionResponses[0].id,'a');
+const stream=adapter.receive();adapter.callbacks.onmessage({serverContent:{turnComplete:true}});assert.equal((await stream.next()).value.type,'serverContent');adapter.callbacks.onmessage({toolCall:{functionCalls:[{id:'b'}]}});assert.equal((await stream.next()).value.functionCalls[0].id,'b');adapter.callbacks.onclose({code:1008,reason:'policy'});await assert.rejects(stream.next(),/1008/);await adapter.close();
+assert.equal(LIVE_MODEL,'gemini-3.1-flash-live-preview');console.log('PASS: App Check token refresh, endpoint errors, live messages, tool response IDs and close diagnostics.');
