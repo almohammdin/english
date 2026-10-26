@@ -24,6 +24,8 @@ jobs:
       - name: Check JavaScript and lesson data
         run: |
           node --check app.js
+          node --check experience.js
+          node tests/experience.test.cjs
           node --check voice-tools.js
           node --check voice-ui.js
           node --check voice-live.mjs
@@ -45,7 +47,7 @@ jobs:
       - name: Prepare public files
         run: |
           mkdir -p public
-          cp index.html style.css data.js curriculum.js coach-data.js exams.js coach.js app.js tutor.js firebase-tutor.mjs firebase-connection.mjs voice-tools.js voice-ui.js voice-live.mjs live-session.mjs audio-input.mjs voice-capture.js book-index.mjs course-search.mjs icon.svg social.png font.woff2 bold.woff2 public/
+          cp experience.js experience.css index.html style.css data.js curriculum.js coach-data.js exams.js coach.js app.js tutor.js firebase-tutor.mjs firebase-connection.mjs voice-tools.js voice-ui.js voice-live.mjs live-session.mjs audio-input.mjs voice-capture.js book-index.mjs course-search.mjs icon.svg social.png font.woff2 bold.woff2 public/
           touch public/.nojekyll
       - uses: actions/upload-pages-artifact@v3
         with:
